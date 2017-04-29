@@ -1,48 +1,66 @@
 package parserImpl;
 
-import parserInterafces.IStatement;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class Directive extends Statement {
+  public static HashSet<String> directives;
+
+  private HashMap<String, Integer> symTab;
 
   public Directive(String state) {
     super(state);
-    // TODO Auto-generated constructor stub
+    directives.add("START");
+
+    directives.add("ORG");
+
+    directives.add("EQU");
+
+    directives.add("RESW");
+
+    directives.add("RESB");
+
+    directives.add("BASE");
+
+    directives.add("NOBASE");
+
+    directives.add("END");
+  }
+  
+  public static boolean isDirective(String statement) {
+    return directives.contains(statement.substring(9,16).toUpperCase().trim());
   }
 
-  @Override
-  public Integer getAddress() {
-    // TODO Auto-generated method stub
-    return null;
+  public void setSymTab(HashMap<String,Integer> symtab) {
+    this.symTab = symtab;
   }
-
-  @Override
-  public void setAddress(Integer address) {
-    // TODO Auto-generated method stub
-
+  public Integer targetAddress() {
+    try {
+      return Integer.valueOf(operands);
+    } catch(NumberFormatException e) {
+      if (symTab.containsKey(operands)) {
+        return symTab.get(operands);
+      }
+    }
+    throw new RuntimeException();//TODO :shoflak message.
   }
-
-  @Override
-  public String operation() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String operands() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String Label() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
+  
   @Override
   public Integer getNextLocationCounter(int LocationCounter) {
-    // TODO Auto-generated method stub
-    return null;
+    switch (operation) {
+    case "EQU":
+      return LocationCounter;
+    case "ORG":
+      return targetAddress();
+    case "RESB":
+      return LocationCounter+targetAddress();
+    case "RESW":
+      return LocationCounter+targetAddress()*Indexer.wordSize; // TODO change wordSize place.
+    default:
+      return LocationCounter+Indexer.wordSize;
+      
+      
+    }
   }
 
 }

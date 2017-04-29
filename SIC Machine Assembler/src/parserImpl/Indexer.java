@@ -2,8 +2,9 @@ package parserImpl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import parserInterafces.IIndexer;
 import parserInterafces.IStatement;
@@ -17,34 +18,15 @@ public class Indexer implements IIndexer {
 	private Integer base;
 	private Integer pc;
 	private List<IStatement> states;
-	public static HashSet<String> directives;
-
-	public static void load() {
-		directives.add("START");
-
-		directives.add("ORG");
-
-		directives.add("EQU");
-
-		directives.add("RESW");
-
-		directives.add("RESB");
-
-		directives.add("WORD");
-
-		directives.add("BYTE");
-
-		directives.add("BASE");
-
-		directives.add("NOBASE");
-
-		directives.add("END");
-	}
+	private Queue < String> Literals;
+	//public static HashSet<String> directives;
+	public static int wordSize = 3; //TODO :read from configuration file.
+	
 
 	public Indexer(List<String> statements) {
 		this.statements = statements;
 		base = null;
-		load();
+		Literals = new LinkedList<String>();
 	}
 
 	@Override
@@ -64,12 +46,14 @@ public class Indexer implements IIndexer {
 
 	protected Statement createStatement(String statement) {
 
-		if (directives.contains(statement.substring(9, 16).toUpperCase())) {
+		if (Directive.isDirective(statement)) {
 			return new Directive(statement);
-		} else
+		} else if(Operation.isOperation(statement))
 			return new Operation(statement);
-		// dreturn null;
+		return null;
 	}
+	
+	
 
 	@Override
 	public void Parse() throws RuntimeException {
@@ -82,20 +66,33 @@ public class Indexer implements IIndexer {
 				generated = new RuntimeException(""); // TODO : zabat di
 			}
 			state.setAddress(loc);
-			loc = state.getNextLocationCounter(loc);
-			if (state.operation().equals("BASE"))
+			if (state.operation().equals("BASE")) {
 				base = symTab.get(state.operands());
-			if (state.operation().equals("NOBASE"))
+				if(base == null)
+				  generated = new RuntimeException(""); // TODO : zabat di
+			}
+			else if (state.operation().equals("NOBASE")) {
 				base = null;
+			}
 			if (state.Label() != null) {
 				if (symTab.containsKey(state.Label())) {
 					generated = new RuntimeException(""); // TODO : zabat di
 				}
 				// TODO :if EQU evaluate expression
-				symTab.put(state.Label(), loc);
+				symTab.put(state.Label(), state.getAddress());
 			}
+
+      loc = state.getNextLocationCounter(loc);
+      if(state.operands().charAt(0)=='=') {
+        Literals.add(state.operands());
+      }
 
 		}
 
+	}
+	
+	protected Integer evaluateLiterals() {
+	  
+    return null;
 	}
 }

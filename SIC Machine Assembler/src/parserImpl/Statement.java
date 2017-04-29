@@ -12,7 +12,9 @@ public abstract class Statement implements IStatement {
 
   protected String operands;
   protected Integer address;
-  
+  public Statement () {
+    
+  }
   public Statement (String state) {
 		this.state = state;
 		address = null;
@@ -35,6 +37,9 @@ public abstract class Statement implements IStatement {
   public String operation() {
     return operation;
   }
+  public static void main(String args[]) {
+    
+  }
 
   @Override
   public String operands() {
@@ -47,8 +52,6 @@ public abstract class Statement implements IStatement {
   }
 
   @Override
-  public Integer getNextLocationCounter(int LocationCounter) {
-    return null;
-  }
+  public abstract Integer getNextLocationCounter(int LocationCounter);
 
 }
