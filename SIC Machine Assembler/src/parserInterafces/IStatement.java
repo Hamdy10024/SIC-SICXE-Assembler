@@ -14,11 +14,9 @@ public interface IStatement {
    */
   public void setAddress(Integer address);
   
-  public String operation();
+  public String operation(); 
   
-  
-  public String operands();
-  
+  public String operands();  
   
   public String Label();
   

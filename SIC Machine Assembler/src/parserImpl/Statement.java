@@ -12,14 +12,15 @@ public abstract class Statement implements IStatement {
 
   protected String operands;
   protected Integer address;
+  
   public Statement (String state) {
-    this.state = state;
-    address = null;
-    label = state.substring(0, 8);
-
-    operation = state.substring(9, 16);
-    operands = state.substring(16);
-  }
+		this.state = state;
+		address = null;
+		label = state.substring(0, 8);
+		operation = state.substring(9, 16);
+		operands = state.substring(16);
+	}
+  
   @Override
   public Integer getAddress() {
     return address;
@@ -28,7 +29,6 @@ public abstract class Statement implements IStatement {
   @Override
   public void setAddress(Integer address) {
     this.address = address;
-
   }
 
   @Override
