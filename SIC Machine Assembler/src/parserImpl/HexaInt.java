@@ -57,6 +57,25 @@ public class HexaInt {
     ret = prefix+ret;
     return ret;
   }
+  @Override
+  public boolean equals(Object x) {
+    if(x instanceof HexaInt) {
+      return ((HexaInt) x).getVal() == val;
+    }
+    if(x instanceof Integer) {
+      return x == val;
+    }
+    if(x instanceof String) {
+      return new HexaInt((String)x).equals(val);
+    }
+   
+    return false;
+  }
+  
+  @Override
+  public Object clone() {
+    return new HexaInt(val,size);
+  }
   public static void main(String args[]) {
     HexaInt into = new HexaInt(15,5);
     System.out.println(into.add(3).toString());
