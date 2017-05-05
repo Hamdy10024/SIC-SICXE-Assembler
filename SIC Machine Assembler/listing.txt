@@ -1,0 +1,14 @@
+null1000	FIRST   		 TL      /t/t 41033 	null
+1003	CLOOP   		 SUB     /t/t 84039 	null
+1006	        		 DA      /t/t 01036 	null
+1009	        		 OMP     /t/t 81030 	null
+100c	        		 EQ      /t/t 01015 	null
+100f	        		 SUB     /t/t 84061 	null
+1012	        		         /t/t c1003 	null
+1015	ENDFIL  		 DA      /t/t 0102a 	null
+1018	        		 TA      /t/t c1039 	null
+101b	        		 DA      /t/t 0102d 	null
+101e	        		 TA      /t/t c1036 	null
+1021	        		 SUB     /t/t 84061 	null
+1024	        		 DL      /t/t 81033 	null
+1027	        		 SUB     /t/t c0000 	null

@@ -5,7 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.FilterWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import parserInterafces.ILister;
 import parserInterafces.IStatement;
@@ -14,7 +16,11 @@ public class Lister implements ILister {
 
 	private String listingString;
 	private String temp;
-
+	private List<IStatement> test;
+	public Lister() {
+		test = new ArrayList<IStatement>();
+		listingString="";
+	}
 	@Override
 	public File generateFile(List<IStatement> statements, File fileName) throws IOException {
 
@@ -46,7 +52,7 @@ public class Lister implements ILister {
 				temp += ' ';
 
 			}
-			listingString += "/t/t ";
+			listingString += "\t\t ";
 			temp = "";
 			temp = item.objectCode();
 			while (temp.length() < 6) {
@@ -58,13 +64,33 @@ public class Lister implements ILister {
 
 			listingString += '\n';
 		}
-		File result = new File("listing.txt");
+		
 
-		FileWriter write = new FileWriter(result);
+		FileWriter write = new FileWriter(fileName);
 		write.append(listingString);
 		write.close();
 		
-		return result;
+		return fileName;
 	}
-
+	public void readExample(File SICProg) throws FileNotFoundException{
+		Scanner sc = new Scanner(SICProg);
+		while(sc.hasNextLine()){
+			String line = sc.nextLine();
+			IStatement item = new StateImpl();
+			item.setLocation(line.substring(0,4).trim());
+			item.setLabel(line.substring(6,14).trim());
+			item.setOperation(line.substring(16,22).trim());
+			item.setOperands(line.substring(24,43).trim());
+			item.setObjectCode(line.substring(43).trim());
+			test.add(item);
+		}
+	}
+	public static void main(String[]arg) throws IOException{
+		File ListingFileTry= new File("testFile.txt");
+		Lister x = new Lister();
+		x.readExample(new File("/home/youssef/Downloads/tests/Outputs/myTest.txt"));
+		x.generateFile(x.test, ListingFileTry);
+		
+	}
+	
 }
