@@ -60,13 +60,13 @@ public class HexaInt {
   @Override
   public boolean equals(Object x) {
     if(x instanceof HexaInt) {
-      return ((HexaInt) x).getVal() == val;
+      return ((HexaInt) x).getVal().equals(val);
     }
     if(x instanceof Integer) {
       return x == val;
     }
     if(x instanceof String) {
-      return new HexaInt((String)x).equals(val);
+      return (new HexaInt((String)x).equals(this));
     }
    
     return false;
