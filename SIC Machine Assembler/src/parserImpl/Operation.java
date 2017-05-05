@@ -30,13 +30,13 @@ public class Operation extends Statement implements IOperation  {
 	}
 
   @Override
-  public Integer getAddress() {
+  public HexaInt getAddress() {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public void setAddress(Integer address) {
+  public void setAddress(HexaInt address) {
     // TODO Auto-generated method stub
     
   }
@@ -62,8 +62,8 @@ public class Operation extends Statement implements IOperation  {
     return true;
   }
   @Override
-  public Integer getNextLocationCounter(int LocationCounter) {
-    return LocationCounter+Indexer.wordSize;
+  public HexaInt getNextLocationCounter(HexaInt LocationCounter) {
+    return LocationCounter.add(Indexer.wordSize);
   }
 
 }

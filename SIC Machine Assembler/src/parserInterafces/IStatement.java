@@ -1,27 +1,27 @@
 package parserInterafces;
-
 public interface IStatement {
+
   
   /**
-   * gets address of current statement.
-   * @return address of the statement in decimal format.
+   * @param object code of the current statement
    */
-  public Integer getAddress();
+  public void setObjectCode(String objectCode);
   
   /**
-   * sets address of current statement.
-   * @parameter address of the statement in decimal format.
+   * @param error message in case of a non-executable statement
    */
-  public void setAddress(Integer address);
+  public void setError(String error);
+
   
-  public String operation(); 
+  public String statement();
+  /**
+   * @return object code of the current statement, or null otherwise
+   */
+  public String objectCode();
   
-  public String operands();  
-  
-  public String Label();
-  
-  public Integer getNextLocationCounter(int LocationCounter);
-  
-  
+  /**
+   * @return error message in case of a non-executable statement, or null otherwise
+   */
+  public String error();
 
 }

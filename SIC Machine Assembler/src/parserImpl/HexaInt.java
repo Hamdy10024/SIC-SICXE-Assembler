@@ -1,0 +1,65 @@
+package parserImpl;
+
+public class HexaInt {
+  private Integer val;
+  private int size;
+  public HexaInt(Integer val){
+    this.val = val;
+    size = 0;
+    while(val > 0){
+      size++;
+      val/=2;
+    }
+  }
+  public HexaInt(Integer val,int bits) {
+    this.val = val;
+    int vval = ~(0);
+    vval <<= bits;
+    vval &=val;
+    if(vval != 0)
+      throw new RuntimeException("Overflow");
+    size = bits;
+  }
+  public Integer getVal() {
+    return val;
+  }
+
+  public Integer getSize() {
+    return size;
+  }
+  public HexaInt(String hex) {
+    this.val = Integer.parseInt(hex,16);
+    size = hex.length()*4;
+  }
+  public HexaInt add(int x) {
+    return new HexaInt(val+x,size);
+  }
+  public HexaInt add(HexaInt x) {
+    return new HexaInt(val+x.getVal(),Math.max(size, x.size));
+  }
+  public HexaInt multiply(int x) {
+    return new HexaInt(val*x);
+  }
+  public HexaInt multiply(HexaInt x) {
+    return new HexaInt(val*x.getVal(),Math.max(size, x.size));
+  }
+
+  public HexaInt or(HexaInt x) {
+    return new HexaInt(val|x.getVal(),Math.max(size, x.size));
+  }
+  @Override
+  public String toString() {
+    String ret = Integer.toHexString(val);
+    String prefix = "";
+    int digi = (int) Math.ceil(size*1.0/4);
+    for(int i = digi-ret.length();i >0;i--)
+      prefix +="0";
+    ret = prefix+ret;
+    return ret;
+  }
+  public static void main(String args[]) {
+    HexaInt into = new HexaInt(15,5);
+    System.out.println(into.add(3).toString());
+  }
+
+}
