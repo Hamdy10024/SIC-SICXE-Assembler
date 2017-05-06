@@ -6,15 +6,16 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import parserInterafces.IStatement;
+import parserInterafces.Record;
 
-public class Record {
+public class TextRecord implements Record{
 
   private HexaInt Loc;
 
   private HexaInt BaseLoc;
   private HexaInt sz;
   private String repres;
-  public Record(IStatement init) {
+  public TextRecord(IStatement init) {
     sz = new HexaInt(0,8);
     Loc = new HexaInt(0,24);
     if(init.objectCode() == null || init.objectCode().length() == 0){
@@ -72,7 +73,7 @@ public class Record {
       g.setObjectCode(op);
       tes.add(g);
     }
-    Record t = new Record(tes.get(0));
+    TextRecord t = new TextRecord(tes.get(0));
     boolean h = true;
     int i;
     for(i =1; i < tes.size() && h ;i++) {

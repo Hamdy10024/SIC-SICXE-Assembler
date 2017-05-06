@@ -28,7 +28,9 @@ public class Lister implements ILister {
 			IStatement item = statements.get(i);
 			listingString += item.location();
 			listingString += '\t';
-			temp = item.Label();
+			temp = (item.Label());
+			if(temp == null)
+			  temp = "";
 
 			if (temp.length() < 8) {
 				while (temp.length() < 8) {
@@ -38,7 +40,8 @@ public class Lister implements ILister {
 			listingString += temp;
 			listingString += "\t\t ";
 			temp = item.operation();
-
+			if(temp == null)
+        temp = "";
 			while (temp.length() < 6) {
 				temp += ' ';
 			}
@@ -46,7 +49,8 @@ public class Lister implements ILister {
 			listingString += temp;
 			listingString += "  ";
 
-			temp = item.operands();
+			temp = item.operands();if(temp == null)
+        temp = "";
 
 			while (temp.length() < 18) {
 				temp += ' ';

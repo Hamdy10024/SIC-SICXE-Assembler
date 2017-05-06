@@ -1,0 +1,10 @@
+1000 TESTP    START   0x1000
+1000          LDA     ALPHA,X
+1003          ADD     BETRA
+1006          STA     GAMMA
+1009          RSUB         
+100c STRIN    BYTE    0Xabc
+100e ALPHA    RESW    0x1
+1011 BETRA    RESW    3
+101a GAMMA    RESW    1
+101d          END     TESTP null
