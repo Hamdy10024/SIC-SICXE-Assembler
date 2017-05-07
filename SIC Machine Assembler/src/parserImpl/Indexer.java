@@ -14,7 +14,6 @@ import java.util.Scanner;
 import java.util.Stack;
 
 import parserInterafces.IIndexer;
-import parserInterafces.IStatement;
 
 public class Indexer implements IIndexer {
 
@@ -24,16 +23,19 @@ public class Indexer implements IIndexer {
   public static HashMap<String, Properties> opTab;
   public static Integer wordSize = 3;
   public static File opTabFile = new File("Op.txt");
-  //private HashMap<String, HexaInt> LitTab;
+  private HashMap<String, HexaInt> litTab;
   private HexaInt Loc;
   private Stack<HexaInt> orgs;
+  private Queue<String> literals;
   private String progName;
 
   public Indexer() {
     symTab = new HashMap<String, HexaInt>();
+    litTab =  new HashMap<String, HexaInt>();
     statements = new ArrayList<String>();
     outStates = new ArrayList<String>();
     orgs = new Stack<HexaInt>();
+    literals = new LinkedList<String>();
   }
 
   private void validateFormat(String state) {
@@ -43,21 +45,31 @@ public class Indexer implements IIndexer {
     operation = ((state.length() >= 15) ? state.substring(9, 15) : state.substring(9)).trim().toUpperCase();
     if (operation.startsWith("+"))
       operation = operation.substring(1);
+    if (!opTab.containsKey(operation) || !opTab.get(operation).containsKey("matcher"))
+      System.out.println(operation + "..");
     String operands = ((state.length() >= 17) ? state.substring(17) : "").trim().toUpperCase();
-    if (state.toUpperCase().matches("[A-Z0-9 ]{8} (\\+?[A-Z ]{6}  \\S+)|\\+?[A-Z]{0,6}"))
+    if (state.toUpperCase().matches("[A-Z0-9 ]{8} ((\\+?[A-Z ]{6}  \\S+)|(\\+?[A-Z]{0,6}))\\s*"))
       if (opTab.containsKey(operation))
-        if (label.matches("[A-Za-z][A-Za-z0-9]*"))
-          ;
-    if (operands.matches(opTab.get(operation).getProperty("matcher")))
-      return;
+        if (label.matches("([A-Za-z][A-Za-z0-9]*)?"))
+
+          if (operands.matches(opTab.get(operation).getProperty("matcher")))
+            return;
+          else {
+            String araf = opTab.get(operation).getProperty("matcher");
+            System.out.println(araf + " " + araf.length());
+            String off = "(([0-9]+)|(0X[0-9A-F]+)|(=?([0-9]+|(X\\'[0-9A-F]+\\')|(C\\'[A-Za-z]+\\'))))";
+            System.out.println(off + " " + off.length());
+          }
     throw new RuntimeException("INVALID Instruction format".toUpperCase());
   }
 
   private HexaInt getValue(String address) {
-   
+    if (address.equals("*"))
+      return Loc;
     if (address == null || address.length() == 0)
       return null;
     if (address.toUpperCase().startsWith("0X")) {
+      // System.out.println(address);
       return new HexaInt(address.substring(2).trim().toLowerCase());
     } else if (address.trim().matches("[0-9]+"))
       return new HexaInt(Integer.parseInt(address));
@@ -86,10 +98,11 @@ public class Indexer implements IIndexer {
 
     if (operation.equals("END"))
       return;
-    HexaInt loc = getValue(address);
+    HexaInt loc;// = getValue(address);
     switch (operation) {
 
     case "ORG":
+      loc = getValue(address);
       if (loc != null) {
         orgs.push(Loc);
         Loc = loc;
@@ -99,9 +112,11 @@ public class Indexer implements IIndexer {
         Loc = orgs.pop();
       return;
     case "RESB":
+      loc = getValue(address);
       Loc = Loc.add(loc);
       return;
     case "RESW":
+      loc = getValue(address);
       Loc = Loc.add(loc.multiply(Indexer.wordSize));
       return;
     case "BYTE":
@@ -113,21 +128,59 @@ public class Indexer implements IIndexer {
         incr += (3 - incr % 3);
       Loc = Loc.add(incr);
       return;
+    case "LTORG":
+      bufferLiterals();
+      return;
     }
   }
 
   private Integer getSize(String Literal) {
+    if (Literal.startsWith("="))
+      Literal = Literal.substring(1);
     if (Literal.matches("[0-9]+")) {
       return ((Integer.parseInt(Literal) > 255) ? wordSize : 1);
-    } else if (Literal.startsWith("0C")) {
-      return Literal.substring(2).replace("'", " ").trim().length();
-    } else if (Literal.startsWith("0X")) {
-      int half = Literal.substring(2).replace("'", " ").trim().length();
+    } else if (Literal.startsWith("C")) {
+      return Literal.substring(1).replace("'", " ").trim().length();
+    } else if (Literal.startsWith("X")) {
+      int half = Literal.substring(1).replace("'", " ").trim().length();
       return (int) Math.ceil(half / 2.0);
+    }
+    else if(Literal.startsWith("0X")) {
+      int half = Literal.substring(2).trim().length();
+      return (int) Math.ceil(half / 2.0);
+    
     }
     return 0;
   }
 
+  private HexaInt evaluateExpression(String express) {
+    int i = 0;
+    String curr ="";
+    boolean adding = true;
+    int rank=0;
+    int val = 0,cval;
+    while(i<express.length()){
+    while(i<express.length() && express.charAt(i)!='+' && express.charAt(i)!='-') {
+     curr+=express.charAt(i++); 
+    }
+    if(curr.matches("[0-9]+")) {
+      cval = Integer.parseInt(curr);
+    } else if(!symTab.containsKey(curr.toUpperCase())){
+      throw new RuntimeException("Invalid Expression".toUpperCase());
+    } else {
+      cval = symTab.get(curr).getVal();
+      rank+=((adding)?1:-1);
+    }
+    val+=(adding)?cval:cval*-1;
+    if(i < express.length()) {
+      adding = express.charAt(i++)=='+';
+    }
+    if (rank > 1 || rank < 0)
+      throw new RuntimeException("Invalid Expression".toUpperCase());
+  }
+    return new HexaInt(val);
+    
+  }
   @Override
   public File Parse(File source) throws RuntimeException, FileNotFoundException, IOException {
     Scanner input = new Scanner(source);
@@ -138,19 +191,26 @@ public class Indexer implements IIndexer {
     boolean check = Parse();
     File inter = new File("Intermediate.txt");
     FileWriter fwr = new FileWriter(inter);
-    
+
     for (String line : outStates)
-      fwr.write(line+"\n");
+      fwr.write(line + "\n");
+    fwr.write("SYMTAB\n");
+    for (String line : symTab.keySet())
+      fwr.write(line + " " + symTab.get(line).toString() + "\n");
+    fwr.write("LITTAB\n");
+    for (String line : litTab.keySet())
+      fwr.write(line + " " + litTab.get(line).toString() + "\n");
+   
     fwr.close();
     input.close();
-    if(check)
+    if (check)
       return inter;
     return null;
   }
 
   private void validateStart(String state) {
 
-    state = state.toUpperCase();
+    state = state.toUpperCase().trim();
     boolean validF = state.matches("[A-Za-z0-9 ]{8} START   [0-9]+")
         || state.matches("[A-Za-z0-9 ]{8} START   0X[0-9A-F]+");
     validF &= state.matches("[A-Za-z][A-Za-z0-9]+\\s+START\\s+[0-9]+")
@@ -158,11 +218,21 @@ public class Indexer implements IIndexer {
     if (!validF) {
       throw new RuntimeException("INVALID START OPERATION");
     }
-    Loc = getValue(state.substring(16).trim());
+    Loc = Loc.add(getValue(state.substring(16).trim()));
     progName = state.substring(0, 8).trim();
     symTab.put(progName, Loc);
   }
-  
+  private void bufferLiterals() {
+    String st = "         *       ";
+    while(!literals.isEmpty()) {
+      String lit = literals.poll();
+      if(litTab.containsKey(lit))
+        continue;
+      outStates.add(Loc+st+lit);
+      litTab.put(lit, Loc);
+      Loc = Loc.add(getSize(lit));
+    }
+  }
 
   private boolean Parse() {
     boolean err = true;
@@ -194,18 +264,21 @@ public class Indexer implements IIndexer {
       }
       ;
       outStates.add(Loc.toString() + " " + state);
-      String label = state.substring(9, 15).trim();
+      String label = (state.length() > 15) ? state.substring(9, 15).trim() : state.substring(9);
 
       String address = null;
       if (state.length() > 17)
         address = state.substring(17).trim();
       if (rerr)
         updateLoc(label, address);
+      if(address!= null && address.charAt(0)=='=') {
+        literals.add(address.substring(1));
+      }
       err &= rerr;
     }
-    
+
     return err;
-    
+
   }
 
   public static void loadOpTab() throws FileNotFoundException {
@@ -224,20 +297,20 @@ public class Indexer implements IIndexer {
         val.setProperty("matcher", "");
 
       if (!opCode.equals("NULL")) {
-        val.setProperty("opCode", opCode);
-      
-        val.put("size", opCode.length()/2);
+        val.setProperty("opCode", opCode.substring(0, 2));
+
+        val.put("size", opCode.length() / 2);
       }
       Indexer.opTab.put(oper, val);
       temp.close();
     }
     loader.close();
-   
+
   }
 
   public static void main(String args[]) throws FileNotFoundException, RuntimeException, IOException {
     // System.out.println("ADD ='100'".matches("ADD =\\S+"));
     loadOpTab();
-    System.out.println(new Indexer().Parse(new File("test.asm")));
+    System.out.println("C'EOF'".matches("(([0-9]+)|(0X[0-9A-F]+)|(=?([0-9]+|(X\\'[0-9A-F]+\\')|(C\\'[A-Za-z]+\\'))))"));
   }
 }

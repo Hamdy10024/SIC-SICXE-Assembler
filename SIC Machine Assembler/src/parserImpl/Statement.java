@@ -2,103 +2,106 @@ package parserImpl;
 
 import parserInterafces.IStatement;
 
-public abstract class Statement {
+public class Statement implements IStatement {
+	
+	private String location;
+	private String label;
+	private String operation;
+	private String operands;
+	private String objectCode;
+	private String error;
+	
+	public Statement() {
+		location = "";
+		label = "";
+		operation = "";
+		operands = "";
+		objectCode = "";
+		error = "";
+	}
+	
+	// to be removed
+	public Statement(String statement) {
+		this.label = null;
+		this.operands = null;
+		this.objectCode = null;
+		this.error = null;
+		setStatement(statement);
+	}
 
-  protected String state;
+	private void setStatement(String statement) {
+		String[] split = statement.split("\\s+");
+		int i = 0;
+		location = split[i++];
+		if (statement.charAt(5) != ' ') // label exists (starting at index 5 of the string)
+			label = split[i++];
+		operation = split[i++];
+		if (i < split.length)
+			operands = split[i];		
+	}
+	
+	@Override
+	public void setLocation(String location) {
+		this.location = location;
+	}
 
-  protected String label;
+	@Override
+	public void setLabel(String label) {
+		this.label = label;
+	}
 
-  protected String operation;
+	@Override
+	public void setOperation(String operation) {
+		this.operation = operation;
+	}
 
-  protected String operands;
+	@Override
+	public void setOperands(String operands) {
+		this.operands = operands;
+	}
 
-  protected String comment;
-  protected HexaInt address;
+	@Override
+	public void setObjectCode(String objectCode) {
+		this.objectCode = objectCode;
+	}
 
-  public Statement() {
+	@Override
+	public void setError(String error) {
+		this.error = error;
+	}
 
-  }
+	@Override
+	public String location() {
+		return location;
+	}
 
-  public Statement(String state) {
-    this.state = state;
-    address = null;
-    label = state.substring(0, 8).trim().toUpperCase();
-    if (label.length() == 0)
-      label = null;
-    operation = state.substring(9, 15).trim().toUpperCase();
-    if (operation.length() == 0)
-      throw new RuntimeException("");
-    if (state.length() > 35) {
-      operands = state.substring(17, 34).trim().toUpperCase();
-      comment = state.substring(35).trim();
-    } else if (state.length() > 17)
-      operands = state.substring(17).trim();
-    else
-      operands = comment = null;
-    if (!label.matches("[_A-Z][A-Z_0-9]*")) {
-      throw new RuntimeException("Invalid Label");
-    }
-    if (operands != null && !operands.matches("[_A-Z][A-Z_0-9]*") && !operands.matches("[0-9]+")
-        && !operands.matches("[_A-Z][A-Z_0-9]*,[XTSA]") && !operands.matches("[XTSA],[XTSA]")) {
-      throw new RuntimeException("Invalid Operands");
-    }
-    if (state.charAt(8) != ' ' || state.charAt(16) != ' ')
-      throw new RuntimeException("Invalid Statement");
+	@Override
+	public String label() {
+		return label;
+	}
 
-  }
+	@Override
+	public String operation() {
+		return operation;
+	}
 
-  public HexaInt getAddress() {
-    return address;
-  }
+	@Override
+	public String operands() {
+		return operands;
+	}
 
-  public void setAddress(HexaInt address) {
-    this.address = address;
-  }
+	@Override
+	public String objectCode() {
+		return objectCode;
+	}
 
-  public String operation() {
-    return operation;
-  }
-
-  public String operands() {
-    return operands;
-  }
-
-  public String Label() {
-    return label;
-  }
-
-  public String getComment() {
-    return comment;
-  }
-
-  public String getStatement() {
-    return state;
-  }
-
-  @Override
-  public String toString() {
-    String state = "";
-    if (address == null)
-      state += "    "; // 4 spaces
-    else
-      state += address.toString();
-    state += " ";
-    if (label == null)
-      state += "        "; // 8 spaces
-    else {
-      state += label;
-      while (state.length() < 13)
-        state += " ";
-    }
-    state += " ";
-    state += operation;
-    while (state.length() < 20)
-      state += " ";
-    state += " ";
-    state += operands;
-    return state;
-  }
-
-  public abstract HexaInt getNextLocationCounter(HexaInt LocationCounter);
+	@Override
+	public String error() {
+		return error;
+	}
+	@Override
+	public String toString(){
+	  return location+" "+label+" "+operation+" "+operands;
+	}
 
 }

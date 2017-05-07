@@ -36,7 +36,7 @@ public class TextRecord implements Record{
   @Override
   public String toString() {
     String Out = "T";
-    Out+=BaseLoc;
+    Out+=BaseLoc+".";
     Out+=sz;
     Out+=repres;
     return Out;
@@ -48,12 +48,10 @@ public class TextRecord implements Record{
         nStatement.objectCode().length() == 0)
       return true;
     if(!Loc.equals(nStatement.location())) {
-      System.out.println("NOO"+Loc+" "+nStatement.location());
       return false;
     }
     if (sz.add(size(nStatement)).getVal() > 30) {
 
-      System.out.println("NOO"+Loc+" "+nStatement.location());
       return false;
     }
     repres+="."+nStatement.objectCode();
@@ -62,26 +60,27 @@ public class TextRecord implements Record{
     return true;
   }
   
-  public static void main(String args[]) throws FileNotFoundException {
-    Scanner sc = new Scanner(new File("testRec.txt"));
-    ArrayList<IStatement> tes = new ArrayList<IStatement>();
-    while(sc.hasNextLine()) {
-      String loc = sc.next();
-      String op = sc.next();
-      StateImpl g = new StateImpl();
-      g.setLocation(loc);
-      g.setObjectCode(op);
-      tes.add(g);
-    }
-    TextRecord t = new TextRecord(tes.get(0));
-    boolean h = true;
-    int i;
-    for(i =1; i < tes.size() && h ;i++) {
-      h =t.push(tes.get(i));
-    }
-    System.out.println(t);
-    
-    System.out.println(i +" "+(tes.size()- i+1));
-  }
-  
+//  public static void main(String args[]) throws FileNotFoundException {
+//    Scanner sc = new Scanner(new File("testRec.txt"));
+//    ArrayList<IStatement> tes = new ArrayList<IStatement>();
+//    while(sc.hasNextLine()) {
+//      String loc = sc.next();
+//      String op = sc.next();
+//      StateImpl g = new StateImpl();
+//      g.setLocation(loc);
+//      g.setObjectCode(op);
+//      tes.add(g);
+//    }
+//    TextRecord t = new TextRecord(tes.get(0));
+//    boolean h = true;
+//    int i;
+//    for(i =1; i < tes.size() && h ;i++) {
+//      h =t.push(tes.get(i));
+//    }
+//    System.out.println(t);
+//    
+//    System.out.println(i +" "+(tes.size()- i+1));
+//    sc.close();
+//  }
+//  
 }

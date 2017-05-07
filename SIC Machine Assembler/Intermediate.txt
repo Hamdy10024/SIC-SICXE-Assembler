@@ -1,10 +1,65 @@
-1000 TESTP    START   0x1000
-1000          LDA     ALPHA,X
-1003          ADD     BETRA
-1006          STA     GAMMA
-1009          RSUB         
-100c STRIN    BYTE    0Xabc
-100e ALPHA    RESW    0x1
-1011 BETRA    RESW    3
-101a GAMMA    RESW    1
-101d          END     TESTP null
+1000 COPY     START   0X1000            
+1000 FIRST    STL     RETADR
+1003 CLOOP    JSUB    RDREC
+1006          LDA     LENGTH
+1009          COMP    ZERO
+100c          JEQ     ENDFIL
+100f          JSUB    WRREC
+1012          J       CLOOP
+1015 ENDFIL   LDA     EOF
+1018          STA     BUFFER
+101b          LDA     THREE
+101e          STA     LENGTH
+1021          JSUB    WRREC
+1024          LDL     RETADR
+1027          RSUB
+102a EOF      BYTE    C'EOF'
+102d THREE    WORD    3
+1030 ZERO     WORD    0
+1033 RETADR   RESW    1
+1036 LENGTH   RESW    1
+1039 BUFFER   RESW    4096
+4039 RDREC    LDX     ZERO
+403c          LDA     ZERO
+403f RLOOP    TD      INPUT
+4042          JEQ     RLOOP
+4045          RD      INPUT
+4048          COMP    ZERO
+404b          JEQ     EXIT
+404e          STCH    BUFFER,X
+4051          TIX     MAXLEN
+4054          JLT     RLOOP
+4057 EXIT     STX     LENGTH
+405a          RSUB
+405d INPUT    BYTE    0XF1
+405e MAXLEN   WORD    4096
+4061 WRREC    LDX     ZERO
+4064 WLOOP    TD      OUTPUT
+4067          JEQ     WLOOP
+406a          LDCH    BUFFER,X
+406d          WD      OUTPUT
+4070          TIX     LENGTH
+4073          JLT     WLOOP
+4076          RSUB
+4079 OUTPUT   BYTE    0X05        
+407a          END     FIRST
+SYMTAB
+ZERO 1030
+INPUT 405d
+WRREC 4061
+OUTPUT 4079
+ENDFIL 1015
+LENGTH 1036
+COPY 1000
+FIRST 1000
+RETADR 1033
+BUFFER 1039
+RLOOP 403f
+MAXLEN 405e
+CLOOP 1003
+WLOOP 4064
+EOF 102a
+RDREC 4039
+EXIT 4057
+THREE 102d
+LITTAB

@@ -16,8 +16,12 @@ public class HexaInt {
     int vval = ~(0);
     vval <<= bits;
     vval &=val;
-    if(vval != 0)
-      throw new RuntimeException("Overflow");
+    if(vval != 0){
+      RuntimeException e =new RuntimeException("Overflow "+ val+ " "+bits);
+      e.printStackTrace();
+      throw e;
+      
+    }
     size = bits;
   }
   public Integer getVal() {

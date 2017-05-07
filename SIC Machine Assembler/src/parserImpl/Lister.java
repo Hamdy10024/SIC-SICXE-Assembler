@@ -3,7 +3,6 @@ package parserImpl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.FilterWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ public class Lister implements ILister {
 			IStatement item = statements.get(i);
 			listingString += item.location();
 			listingString += '\t';
-			temp = (item.Label());
+			temp = (item.label());
 			if(temp == null)
 			  temp = "";
 
@@ -49,13 +48,15 @@ public class Lister implements ILister {
 			listingString += temp;
 			listingString += "  ";
 
-			temp = item.operands();if(temp == null)
+			temp = item.operands();
+			if(temp == null)
         temp = "";
 
 			while (temp.length() < 18) {
 				temp += ' ';
 
 			}
+			listingString+=temp;
 			listingString += "\t\t ";
 			temp = "";
 			temp = item.objectCode();
@@ -76,25 +77,26 @@ public class Lister implements ILister {
 		
 		return fileName;
 	}
-	public void readExample(File SICProg) throws FileNotFoundException{
-		Scanner sc = new Scanner(SICProg);
-		while(sc.hasNextLine()){
-			String line = sc.nextLine();
-			IStatement item = new StateImpl();
-			item.setLocation(line.substring(0,4).trim());
-			item.setLabel(line.substring(6,14).trim());
-			item.setOperation(line.substring(16,22).trim());
-			item.setOperands(line.substring(24,43).trim());
-			item.setObjectCode(line.substring(43).trim());
-			test.add(item);
-		}
-	}
-	public static void main(String[]arg) throws IOException{
-		File ListingFileTry= new File("testFile.txt");
-		Lister x = new Lister();
-		x.readExample(new File("/home/youssef/Downloads/tests/Outputs/myTest.txt"));
-		x.generateFile(x.test, ListingFileTry);
-		
-	}
-	
+//	public void readExample(File SICProg) throws FileNotFoundException{
+//		Scanner sc = new Scanner(SICProg);
+//		while(sc.hasNextLine()){
+//			String line = sc.nextLine();
+//			IStatement item = new StateImpl();
+//			item.setLocation(line.substring(0,4).trim());
+//			item.setLabel(line.substring(6,14).trim());
+//			item.setOperation(line.substring(16,22).trim());
+//			item.setOperands(line.substring(24,43).trim());
+//			item.setObjectCode(line.substring(43).trim());
+//			test.add(item);
+//		}
+//		sc.close();
+//	}
+//	public static void main(String[]arg) throws IOException{
+//		File ListingFileTry= new File("testFile.txt");
+//		Lister x = new Lister();
+//		x.readExample(new File("/home/youssef/Downloads/tests/Outputs/myTest.txt"));
+//		x.generateFile(x.test, ListingFileTry);
+//		
+//	}
+//	
 }
