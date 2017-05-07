@@ -28,6 +28,7 @@ public class Assembler {
         i++;
       out+=tr+"\n";
     }
+    out+= new EndRecord(code.get(0), null)+"\n";
     File Obj = new File("ObjectCode.txt");
     FileWriter writ = new FileWriter(Obj);
     writ.write(out);
